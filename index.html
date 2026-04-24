@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeVox Music</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: linear-gradient(135deg, #1a1a2e, #0f0f23);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        .player {
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(10px);
+            border-radius: 32px;
+            padding: 30px 25px;
+            width: 100%;
+            max-width: 380px;
+            box-shadow: 0 25px 45px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .wolf {
+            text-align: center;
+            font-size: 70px;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 0 15px rgba(255,165,0,0.4));
+            animation: headBob 2s ease-in-out infinite;
+        }
+        @keyframes headBob {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+        h2 {
+            color: white;
+            text-align: center;
+            font-size: 22px;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+        }
+        .marquee-container {
+            background: rgba(0,0,0,0.5);
+            border-radius: 50px;
+            padding: 12px 20px;
+            margin: 20px 0;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .marquee {
+            display: inline-block;
+            animation: scroll 8s linear infinite;
+            color: #ffaa44;
+            font-size: 16px;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+        @keyframes scroll {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        .track-name {
+            text-align: center;
+            color: #aaa;
+            font-size: 14px;
+            margin: 10px 0 20px;
+        }
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 25px 0 15px;
+        }
+        button {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 60px;
+            padding: 12px 24px;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        button:active {
+            transform: scale(0.95);
+            background: #ffaa44;
+            color: #1a1a2e;
+        }
+        .test-badge {
+            text-align: center;
+            color: #ffaa44;
+            font-size: 12px;
+            margin-top: 15px;
+            opacity: 0.7;
+        }
+        .status {
+            text-align: center;
+            color: #88ff88;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+    </style>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+    <div class="player">
+        <div class="wolf">🐺🎧</div>
+        <h2>DeVox Music</h2>
+        
+        <div class="marquee-container">
+            <div class="marquee" id="marqueeText">
+                🎵 Включай на полную — волк в деле! 🐺✨
+            </div>
+        </div>
+        
+        <div class="track-name" id="trackName">
+            ♪ Путешествие начинается... ♪
+        </div>
+        
+        <div class="buttons">
+            <button id="playBtn">▶️ Play</button>
+            <button id="pauseBtn">⏸️ Пауза</button>
+            <button id="stopBtn">⏹️ Стоп</button>
+        </div>
+        
+        <div class="status" id="status">
+            ⚡ Готов к воспроизведению
+        </div>
+        <div class="test-badge">
+            🚀 Тестовый режим
+        </div>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
+        
+        let audioContext = null;
+        let isPlaying = false;
+        let oscillator = null;
+        let gainNode = null;
+        
+        const marqueeTexts = [
+            "🎵 Путешествие начинается... 🎵",
+            "🐺 DeVox FM — музыка для дороги",
+            "🎧 Волк в наушниках — твой спутник",
+            "✨ Слушай и путешествуй с комфортом",
+            "🎶 Включай на полную — волк в деле!"
+        ];
+        
+        let marqueeIndex = 0;
+        
+        function updateMarquee() {
+            marqueeIndex = (marqueeIndex + 1) % marqueeTexts.length;
+            document.getElementById('marqueeText').textContent = marqueeTexts[marqueeIndex];
+            document.getElementById('trackName').innerHTML = `♪ ${marqueeTexts[marqueeIndex]} ♪`;
+        }
+        
+        setInterval(updateMarquee, 8000);
+        
+        function playTone() {
+            if (audioContext === null) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            
+            if (oscillator) {
+                try {
+                    oscillator.stop();
+                } catch(e) {}
+            }
+            
+            oscillator = audioContext.createOscillator();
+            gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.type = 'sine';
+            oscillator.frequency.value = 440;
+            gainNode.gain.value = 0.3;
+            
+            oscillator.start();
+            gainNode.gain.exponentialRampToValueAtTime(0.00001, audioContext.currentTime + 1.5);
+            
+            document.getElementById('status').innerHTML = '🎵 Играет тестовый звук';
+            document.getElementById('status').style.color = '#88ff88';
+            isPlaying = true;
+            
+            tg.sendData(JSON.stringify({ action: 'play', track: 'DeVox FM' }));
+            
+            setTimeout(() => {
+                if (isPlaying) {
+                    document.getElementById('status').innerHTML = '🎵 Музыка играет...';
+                }
+            }, 500);
+        }
+        
+        function pauseTone() {
+            if (oscillator) {
+                try {
+                    oscillator.stop();
+                } catch(e) {}
+                oscillator = null;
+            }
+            if (audioContext) {
+                audioContext.close();
+                audioContext = null;
+            }
+            isPlaying = false;
+            document.getElementById('status').innerHTML = '⏸️ Пауза';
+            document.getElementById('status').style.color = '#ffaa44';
+            tg.sendData(JSON.stringify({ action: 'pause' }));
+        }
+        
+        function stopTone() {
+            if (oscillator) {
+                try {
+                    oscillator.stop();
+                } catch(e) {}
+                oscillator = null;
+            }
+            if (audioContext) {
+                audioContext.close();
+                audioContext = null;
+            }
+            isPlaying = false;
+            document.getElementById('status').innerHTML = '⏹️ Остановлено';
+            document.getElementById('status').style.color = '#ff8888';
+            tg.sendData(JSON.stringify({ action: 'stop' }));
+        }
+        
+        document.getElementById('playBtn').onclick = () => {
+            playTone();
+        };
+        
+        document.getElementById('pauseBtn').onclick = () => {
+            pauseTone();
+        };
+        
+        document.getElementById('stopBtn').onclick = () => {
+            stopTone();
+        };
+    </script>
+</body>
+</html>
