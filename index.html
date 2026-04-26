@@ -11,7 +11,7 @@
             box-sizing: border-box;
         }
         body {
-            background: linear-gradient(135deg, #1a1a2e, #0f0f23);
+            background: #0a0a0a;
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -20,19 +20,18 @@
             padding: 20px;
         }
         .app {
-            background: rgba(255,255,255,0.08);
-            backdrop-filter: blur(10px);
+            background: #0f0f0f;
             border-radius: 32px;
             padding: 30px 24px;
             width: 100%;
             max-width: 400px;
-            box-shadow: 0 25px 45px rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 25px 45px rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,255,255,0.08);
             text-align: center;
         }
         .decox-emoji {
             font-size: 72px;
-            filter: drop-shadow(0 0 15px rgba(255,165,0,0.5));
+            filter: drop-shadow(0 0 15px rgba(255,165,0,0.6));
             animation: float 3s ease-in-out infinite;
         }
         @keyframes float {
@@ -40,19 +39,20 @@
             50% { transform: translateY(-10px); }
         }
         h1 {
-            color: white;
+            color: #ffffff;
             font-size: 28px;
             margin: 12px 0 8px;
             letter-spacing: 1px;
+            font-weight: 600;
         }
         .sub {
-            color: #aaa;
+            color: #888;
             font-size: 13px;
             margin-bottom: 24px;
         }
         .sound-hint {
-            background: rgba(255,200,100,0.15);
-            border: 1px solid rgba(255,200,100,0.4);
+            background: rgba(255,200,100,0.1);
+            border: 1px solid rgba(255,200,100,0.25);
             border-radius: 50px;
             padding: 10px 16px;
             margin-bottom: 24px;
@@ -62,7 +62,6 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
-            backdrop-filter: blur(4px);
         }
         .ask-button {
             width: 100%;
@@ -72,7 +71,7 @@
             padding: 18px 20px;
             font-size: 20px;
             font-weight: bold;
-            color: #1a1a2e;
+            color: #1a1a1a;
             cursor: pointer;
             transition: all 0.2s ease;
             display: flex;
@@ -85,7 +84,7 @@
             transform: scale(0.97);
         }
         .status {
-            background: rgba(0,0,0,0.4);
+            background: rgba(255,255,255,0.05);
             border-radius: 40px;
             padding: 10px 16px;
             font-size: 14px;
@@ -93,15 +92,17 @@
             margin-bottom: 24px;
             transition: all 0.2s;
             word-break: break-word;
+            border: 1px solid rgba(255,255,255,0.05);
         }
         .compact-player {
-            background: rgba(0,0,0,0.4);
+            background: rgba(255,255,255,0.05);
             border-radius: 50px;
             padding: 8px 12px;
             margin-top: 8px;
+            border: 1px solid rgba(255,255,255,0.05);
         }
         .marquee-container {
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.6);
             border-radius: 50px;
             padding: 6px 12px;
             margin-bottom: 8px;
@@ -127,31 +128,32 @@
             flex-wrap: wrap;
         }
         .player-controls button {
-            background: rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.1);
             border: none;
             border-radius: 40px;
             padding: 5px 12px;
             font-size: 12px;
-            color: white;
+            color: #ddd;
             cursor: pointer;
+            transition: all 0.1s ease;
         }
         .player-controls button:active {
             background: #ffaa44;
-            color: #1a1a2e;
+            color: #1a1a1a;
         }
         .track-name {
             font-size: 10px;
-            color: #888;
+            color: #666;
             text-align: center;
             margin-top: 6px;
         }
         .footer {
             font-size: 10px;
-            color: #555;
+            color: #444;
             margin-top: 20px;
         }
         hr {
-            border-color: rgba(255,255,255,0.1);
+            border-color: rgba(255,255,255,0.05);
             margin: 16px 0;
         }
     </style>
@@ -175,7 +177,6 @@
             🐺 Нажми и задай вопрос о путешествиях
         </div>
 
-        <!-- ПЛЕЕР С БЕГУЩЕЙ СТРОКОЙ (как в старом DeVox-music) -->
         <div class="compact-player">
             <div class="marquee-container">
                 <div class="marquee" id="marqueeText">
@@ -202,8 +203,8 @@
         tg.ready();
         tg.expand();
 
-        // ========== ВРЕМЕННЫЙ URL ДЛЯ ТЕСТА CORS ==========
-        const BOT_URL = 'https://httpbin.org';
+        // ========== РЕАЛЬНЫЙ URL БОТА (ИСПРАВЛЕНО) ==========
+        const BOT_URL = 'https://devox-bot.onrender.com';
         // ==================================================
 
         // --- БЕГУЩАЯ СТРОКА ---
@@ -259,8 +260,8 @@
         async function askAndSpeak(questionText) {
             statusDiv.innerHTML = "🤔 Думаю...";
             try {
-                // Отправляем вопрос на тестовый эндпоинт httpbin
-                const response = await fetch(`${BOT_URL}/post`, {
+                // 1. Отправляем вопрос на /ask
+                const response = await fetch(`${BOT_URL}/ask`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ question: questionText, lang: 'ru' })
@@ -269,18 +270,38 @@
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 
                 const data = await response.json();
-                // httpbin возвращает то, что мы отправили, в поле json
-                const answer = data.json?.question || "Тестовый ответ: связь работает! Если вы это видите — CORS не блокирует, проблема в боте.";
+                const answer = data.answer || "Извините, не удалось получить ответ.";
                 
-                statusDiv.innerHTML = "🎧 Отвечаю голосом (тест)...";
-                // Временно используем браузерный голос, чтобы не ждать /tts
-                const utterance = new SpeechSynthesisUtterance(answer.substring(0, 200));
-                utterance.lang = 'ru-RU';
-                window.speechSynthesis.cancel();
-                window.speechSynthesis.speak(utterance);
-                utterance.onend = () => {
-                    statusDiv.innerHTML = "✅ Готов к следующему вопросу";
-                };
+                // 2. Получаем аудио от бота через /tts
+                statusDiv.innerHTML = "🎧 Отвечаю голосом...";
+                const ttsResponse = await fetch(`${BOT_URL}/tts`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: answer, lang: 'ru' })
+                });
+                
+                if (ttsResponse.ok) {
+                    const audioBlob = await ttsResponse.blob();
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    if (currentVoiceAudio) {
+                        currentVoiceAudio.pause();
+                        currentVoiceAudio = null;
+                    }
+                    currentVoiceAudio = new Audio(audioUrl);
+                    currentVoiceAudio.play();
+                    currentVoiceAudio.onended = () => {
+                        URL.revokeObjectURL(audioUrl);
+                        statusDiv.innerHTML = "✅ Готов к следующему вопросу";
+                    };
+                } else {
+                    const utterance = new SpeechSynthesisUtterance(answer);
+                    utterance.lang = 'ru-RU';
+                    window.speechSynthesis.cancel();
+                    window.speechSynthesis.speak(utterance);
+                    utterance.onend = () => {
+                        statusDiv.innerHTML = "✅ Готов к следующему вопросу";
+                    };
+                }
             } catch (error) {
                 console.error(error);
                 statusDiv.innerHTML = "❌ Ошибка связи. Проверьте CORS или URL бота";
