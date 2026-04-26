@@ -100,6 +100,26 @@
             padding: 8px 12px;
             margin-top: 8px;
         }
+        .marquee-container {
+            background: rgba(0,0,0,0.5);
+            border-radius: 50px;
+            padding: 6px 12px;
+            margin-bottom: 8px;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .marquee {
+            display: inline-block;
+            animation: scroll 8s linear infinite;
+            color: #ffaa44;
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+        @keyframes scroll {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
         .player-controls {
             display: flex;
             justify-content: center;
@@ -143,23 +163,25 @@
         <h1>DeVox</h1>
         <div class="sub">Голосовой помощник в путешествиях</div>
 
-        <!-- ПОДСКАЗКА ПРО ЗВУК И НАУШНИКИ -->
         <div class="sound-hint" id="soundHint">
             🎧 Одень наушники для лучшего эффекта 🔊
         </div>
 
-        <!-- ГЛАВНАЯ КНОПКА -->
         <button class="ask-button" id="askBtn">
             🎤 Спросить DeVox
         </button>
 
-        <!-- СТАТУС (без текста ответа) -->
         <div class="status" id="status">
             🐺 Нажми и задай вопрос о путешествиях
         </div>
 
-        <!-- МУЗЫКАЛЬНЫЙ ПЛЕЕР (компактный) -->
+        <!-- ПЛЕЕР С БЕГУЩЕЙ СТРОКОЙ (как в старом DeVox-music) -->
         <div class="compact-player">
+            <div class="marquee-container">
+                <div class="marquee" id="marqueeText">
+                    🎵 Включай на полную — волк в деле! 🐺✨
+                </div>
+            </div>
             <div class="player-controls">
                 <button id="playMusicBtn">▶️ Play</button>
                 <button id="pauseMusicBtn">⏸️ Пауза</button>
@@ -169,6 +191,7 @@
             </div>
             <div class="track-name" id="trackName">🎵 DeVox Music · Тестовое пианино</div>
         </div>
+
         <div class="footer">
             🐺 Спрашивай про города, погоду, еду и достопримечательности
         </div>
@@ -179,12 +202,27 @@
         tg.ready();
         tg.expand();
 
-        // ========== НАСТРОЙКИ ==========
-        // ВАЖНО: замени URL на адрес твоего бота на Render
-        const BOT_URL = 'https://devox-bot.onrender.com';
-        // ================================
+        // ========== ВРЕМЕННЫЙ URL ДЛЯ ТЕСТА CORS ==========
+        const BOT_URL = 'https://httpbin.org';
+        // ==================================================
 
-        // --- ГОЛОСОВОЙ ИИ (без текста, только голос) ---
+        // --- БЕГУЩАЯ СТРОКА ---
+        const marqueeMessages = [
+            "🎵 Путешествие начинается... 🎵",
+            "🐺 DeVox FM — музыка для дороги",
+            "🎧 Волк в наушниках — твой спутник",
+            "✨ Слушай и путешествуй с комфортом",
+            "🎶 Включай на полную — волк в деле!"
+        ];
+        let marqueeIndex = 0;
+        function updateMarquee() {
+            marqueeIndex = (marqueeIndex + 1) % marqueeMessages.length;
+            const marqueeEl = document.getElementById('marqueeText');
+            if (marqueeEl) marqueeEl.textContent = marqueeMessages[marqueeIndex];
+        }
+        setInterval(updateMarquee, 8000);
+
+        // --- ГОЛОСОВОЙ ИИ ---
         let audioContext = null;
         let currentVoiceAudio = null;
         let recognition = null;
@@ -192,7 +230,6 @@
         const statusDiv = document.getElementById('status');
         let useSpeechRecognition = false;
 
-        // Web Speech API
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (SpeechRecognition) {
             useSpeechRecognition = true;
@@ -203,7 +240,6 @@
             recognition.maxAlternatives = 1;
         }
 
-        // Активация аудиоконтекста (обход автовоспроизведения)
         function initAudioContext() {
             if (!audioContext) {
                 audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -220,62 +256,37 @@
             }
         }
 
-        // Отправка в бот и автоматическое воспроизведение голоса (без текста)
         async function askAndSpeak(questionText) {
             statusDiv.innerHTML = "🤔 Думаю...";
             try {
-                // 1. Отправляем вопрос на /ask
-                const response = await fetch(`${BOT_URL}/ask`, {
+                // Отправляем вопрос на тестовый эндпоинт httpbin
+                const response = await fetch(`${BOT_URL}/post`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ question: questionText, lang: 'ru' })
                 });
                 
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 
                 const data = await response.json();
-                const answer = data.answer || "Извините, не удалось получить ответ.";
+                // httpbin возвращает то, что мы отправили, в поле json
+                const answer = data.json?.question || "Тестовый ответ: связь работает! Если вы это видите — CORS не блокирует, проблема в боте.";
                 
-                // 2. Получаем аудио от бота через /tts
-                statusDiv.innerHTML = "🎧 Отвечаю голосом...";
-                const ttsResponse = await fetch(`${BOT_URL}/tts`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text: answer, lang: 'ru' })
-                });
-                
-                if (ttsResponse.ok) {
-                    const audioBlob = await ttsResponse.blob();
-                    const audioUrl = URL.createObjectURL(audioBlob);
-                    if (currentVoiceAudio) {
-                        currentVoiceAudio.pause();
-                        currentVoiceAudio = null;
-                    }
-                    currentVoiceAudio = new Audio(audioUrl);
-                    currentVoiceAudio.play();
-                    currentVoiceAudio.onended = () => {
-                        URL.revokeObjectURL(audioUrl);
-                        statusDiv.innerHTML = "✅ Готов к следующему вопросу";
-                    };
-                } else {
-                    // fallback: браузерный голос
-                    const utterance = new SpeechSynthesisUtterance(answer);
-                    utterance.lang = 'ru-RU';
-                    window.speechSynthesis.cancel();
-                    window.speechSynthesis.speak(utterance);
-                    utterance.onend = () => {
-                        statusDiv.innerHTML = "✅ Готов к следующему вопросу";
-                    };
-                }
+                statusDiv.innerHTML = "🎧 Отвечаю голосом (тест)...";
+                // Временно используем браузерный голос, чтобы не ждать /tts
+                const utterance = new SpeechSynthesisUtterance(answer.substring(0, 200));
+                utterance.lang = 'ru-RU';
+                window.speechSynthesis.cancel();
+                window.speechSynthesis.speak(utterance);
+                utterance.onend = () => {
+                    statusDiv.innerHTML = "✅ Готов к следующему вопросу";
+                };
             } catch (error) {
-                console.error('Ошибка:', error);
-                statusDiv.innerHTML = "❌ Ошибка связи. Попробуйте позже";
+                console.error(error);
+                statusDiv.innerHTML = "❌ Ошибка связи. Проверьте CORS или URL бота";
             }
         }
 
-        // Запись голоса пользователя
         function startVoiceInput() {
             if (!useSpeechRecognition) {
                 statusDiv.innerHTML = "❌ Ваш браузер не поддерживает голосовой ввод";
@@ -306,13 +317,12 @@
             };
         }
 
-        // Кнопка «Спросить»
         document.getElementById('askBtn').onclick = () => {
             initAudioContext();
             startVoiceInput();
         };
 
-        // --- МУЗЫКАЛЬНЫЙ ПЛЕЕР (компактный) ---
+        // --- МУЗЫКАЛЬНЫЙ ПЛЕЕР ---
         let musicCtx = null;
         let musicOsc = null;
         let musicGain = null;
