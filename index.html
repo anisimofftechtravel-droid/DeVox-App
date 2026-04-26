@@ -87,11 +87,12 @@
         .status {
             background: rgba(0,0,0,0.4);
             border-radius: 40px;
-            padding: 12px 16px;
+            padding: 10px 16px;
             font-size: 14px;
             color: #88ff88;
             margin-bottom: 24px;
             transition: all 0.2s;
+            word-break: break-word;
         }
         .compact-player {
             background: rgba(0,0,0,0.4);
@@ -178,6 +179,11 @@
         tg.ready();
         tg.expand();
 
+        // ========== НАСТРОЙКИ ==========
+        // ВАЖНО: замени URL на адрес твоего бота на Render
+        const BOT_URL = 'https://devox-bot.onrender.com';
+        // ================================
+
         // --- ГОЛОСОВОЙ ИИ (без текста, только голос) ---
         let audioContext = null;
         let currentVoiceAudio = null;
@@ -218,17 +224,23 @@
         async function askAndSpeak(questionText) {
             statusDiv.innerHTML = "🤔 Думаю...";
             try {
-                const response = await fetch('https://your-bot.onrender.com/ask', {
+                // 1. Отправляем вопрос на /ask
+                const response = await fetch(`${BOT_URL}/ask`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ question: questionText, lang: 'ru' })
                 });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
                 const data = await response.json();
                 const answer = data.answer || "Извините, не удалось получить ответ.";
                 
-                // Получаем аудио от бота
+                // 2. Получаем аудио от бота через /tts
                 statusDiv.innerHTML = "🎧 Отвечаю голосом...";
-                const ttsResponse = await fetch('https://your-bot.onrender.com/tts', {
+                const ttsResponse = await fetch(`${BOT_URL}/tts`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ text: answer, lang: 'ru' })
@@ -258,7 +270,7 @@
                     };
                 }
             } catch (error) {
-                console.error(error);
+                console.error('Ошибка:', error);
                 statusDiv.innerHTML = "❌ Ошибка связи. Попробуйте позже";
             }
         }
@@ -372,4 +384,4 @@
         };
     </script>
 </body>
-    </html>
+</html>
