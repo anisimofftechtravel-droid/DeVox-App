@@ -22,63 +22,104 @@
         .app {
             background: #0f0f0f;
             border-radius: 32px;
-            padding: 30px 24px;
+            padding: 24px 20px;
             width: 100%;
-            max-width: 400px;
+            max-width: 450px;
             box-shadow: 0 25px 45px rgba(0,0,0,0.6);
             border: 1px solid rgba(255,255,255,0.08);
-            text-align: center;
         }
         .decox-emoji {
-            font-size: 72px;
+            font-size: 64px;
+            text-align: center;
             filter: drop-shadow(0 0 15px rgba(255,165,0,0.6));
             animation: float 3s ease-in-out infinite;
         }
         @keyframes float {
             0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
+            50% { transform: translateY(-8px); }
         }
         h1 {
-            color: #ffffff;
-            font-size: 28px;
-            margin: 12px 0 8px;
-            letter-spacing: 1px;
+            color: white;
+            font-size: 26px;
+            text-align: center;
+            margin: 12px 0 4px;
             font-weight: 600;
         }
         .sub {
             color: #888;
-            font-size: 13px;
-            margin-bottom: 24px;
+            font-size: 12px;
+            text-align: center;
+            margin-bottom: 20px;
         }
-        .sound-hint {
-            background: rgba(255,200,100,0.1);
-            border: 1px solid rgba(255,200,100,0.25);
-            border-radius: 50px;
-            padding: 10px 16px;
-            margin-bottom: 24px;
-            font-size: 13px;
-            color: #ffcc88;
+        /* ЭКРАН-ПЕЙДЖЕР (временный) */
+        .info-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 24px;
+            padding: 16px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .location-header {
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 10px;
+            gap: 8px;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .location-header span:first-child {
+            font-size: 20px;
+        }
+        .location-header span:last-child {
+            color: #ffaa44;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        .weather-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .weather-temp {
+            font-size: 28px;
+            font-weight: bold;
+            color: white;
+        }
+        .weather-desc {
+            color: #aaa;
+            font-size: 14px;
+        }
+        .weather-meta {
+            display: flex;
+            gap: 16px;
+            margin: 10px 0;
+            font-size: 12px;
+            color: #888;
+        }
+        .ai-tip {
+            background: rgba(255,200,100,0.1);
+            border-radius: 16px;
+            padding: 10px 12px;
+            font-size: 12px;
+            color: #ffcc88;
+            margin-top: 10px;
         }
         .ask-button {
             width: 100%;
             background: linear-gradient(135deg, #ffaa44, #ff8844);
             border: none;
             border-radius: 60px;
-            padding: 18px 20px;
-            font-size: 20px;
+            padding: 16px 20px;
+            font-size: 18px;
             font-weight: bold;
             color: #1a1a1a;
             cursor: pointer;
-            transition: all 0.2s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
-            margin-bottom: 24px;
+            gap: 10px;
+            margin-bottom: 20px;
         }
         .ask-button:active {
             transform: scale(0.97);
@@ -87,11 +128,10 @@
             background: rgba(255,255,255,0.05);
             border-radius: 40px;
             padding: 10px 16px;
-            font-size: 14px;
+            font-size: 13px;
             color: #88ff88;
-            margin-bottom: 24px;
-            transition: all 0.2s;
-            word-break: break-word;
+            margin-bottom: 20px;
+            text-align: center;
             border: 1px solid rgba(255,255,255,0.05);
         }
         .compact-player {
@@ -99,7 +139,6 @@
             border-radius: 50px;
             padding: 8px 12px;
             margin-top: 8px;
-            border: 1px solid rgba(255,255,255,0.05);
         }
         .marquee-container {
             background: rgba(0,0,0,0.6);
@@ -113,9 +152,7 @@
             display: inline-block;
             animation: scroll 8s linear infinite;
             color: #ffaa44;
-            font-size: 12px;
-            font-weight: 500;
-            letter-spacing: 1px;
+            font-size: 11px;
         }
         @keyframes scroll {
             0% { transform: translateX(100%); }
@@ -124,37 +161,33 @@
         .player-controls {
             display: flex;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
             flex-wrap: wrap;
         }
         .player-controls button {
             background: rgba(255,255,255,0.1);
             border: none;
             border-radius: 40px;
-            padding: 5px 12px;
-            font-size: 12px;
+            padding: 4px 10px;
+            font-size: 11px;
             color: #ddd;
             cursor: pointer;
-            transition: all 0.1s ease;
         }
         .player-controls button:active {
             background: #ffaa44;
             color: #1a1a1a;
         }
         .track-name {
-            font-size: 10px;
+            font-size: 9px;
             color: #666;
             text-align: center;
             margin-top: 6px;
         }
         .footer {
-            font-size: 10px;
+            font-size: 9px;
             color: #444;
-            margin-top: 20px;
-        }
-        hr {
-            border-color: rgba(255,255,255,0.05);
-            margin: 16px 0;
+            text-align: center;
+            margin-top: 16px;
         }
     </style>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -165,8 +198,24 @@
         <h1>DeVox</h1>
         <div class="sub">Голосовой помощник в путешествиях</div>
 
-        <div class="sound-hint" id="soundHint">
-            🎧 Одень наушники для лучшего эффекта 🔊
+        <!-- ЭКРАН-ПЕЙДЖЕР: локация + погода -->
+        <div class="info-card" id="infoCard">
+            <div class="location-header">
+                <span>📍</span>
+                <span id="locationName">Определение местоположения...</span>
+            </div>
+            <div id="weatherBlock">
+                <div class="weather-row">
+                    <span class="weather-temp" id="weatherTemp">--°C</span>
+                    <span class="weather-desc" id="weatherDesc">--</span>
+                </div>
+                <div class="weather-meta" id="weatherMeta">
+                    💨 -- м/с &nbsp;|&nbsp; 💧 --%
+                </div>
+                <div class="ai-tip" id="weatherTip">
+                    ✨ Совет: ...
+                </div>
+            </div>
         </div>
 
         <button class="ask-button" id="askBtn">
@@ -177,6 +226,7 @@
             🐺 Нажми и задай вопрос о путешествиях
         </div>
 
+        <!-- Плеер с бегущей строкой -->
         <div class="compact-player">
             <div class="marquee-container">
                 <div class="marquee" id="marqueeText">
@@ -203,9 +253,11 @@
         tg.ready();
         tg.expand();
 
-        // ========== РЕАЛЬНЫЙ URL БОТА (ИСПРАВЛЕНО) ==========
+        // ========== НАСТРОЙКИ ==========
         const BOT_URL = 'https://devox-bot.onrender.com';
-        // ==================================================
+        let currentLang = 'ru';
+        let currentLat = null;
+        let currentLon = null;
 
         // --- БЕГУЩАЯ СТРОКА ---
         const marqueeMessages = [
@@ -223,11 +275,70 @@
         }
         setInterval(updateMarquee, 8000);
 
-        // --- ГОЛОСОВОЙ ИИ ---
+        // --- ОПРЕДЕЛЕНИЕ ЯЗЫКА ПО ТЕКСТУ (ру, en, fr, zh) ---
+        function detectLanguage(text) {
+            if (/[а-яё]/i.test(text)) return 'ru';
+            if (/[éèêëàâçîïûü]/i.test(text)) return 'fr';
+            if (/[\u4e00-\u9fff\u3400-\u4dbf]/.test(text)) return 'zh';
+            if (/[a-z]/i.test(text)) return 'en';
+            return 'ru';
+        }
+
+        // --- ГЕОЛОКАЦИЯ И ОБНОВЛЕНИЕ ЭКРАНА ---
+        function updateLocationAndWeather(lat, lon, lang) {
+            // Обновляем координаты
+            currentLat = lat;
+            currentLon = lon;
+            // Запрашиваем погоду у бота
+            fetch(`${BOT_URL}/weather`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ lat, lon, lang })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.text) {
+                    // Парсим текст погоды (упрощённо)
+                    const weatherText = data.text;
+                    document.getElementById('weatherTemp').innerHTML = weatherText.match(/[+-]?\d+°C/)?.[0] || '--°C';
+                    document.getElementById('weatherDesc').innerHTML = weatherText.match(/[а-яa-z]+/i)?.[0] || '--';
+                    const windHum = weatherText.match(/💨\s*[\d\.]+\s*м\/с\s*[│|]?\s*💧\s*[\d\.]+%/);
+                    if (windHum) document.getElementById('weatherMeta').innerHTML = windHum[0];
+                    // Совет — берём строку после «✨ *Совет:*»
+                    const tipMatch = weatherText.match(/✨\s*\*Совет:\*\s*(.+?)(?:\n|$)/i);
+                    if (tipMatch) document.getElementById('weatherTip').innerHTML = `✨ Совет: ${tipMatch[1]}`;
+                }
+            })
+            .catch(e => console.warn("Ошибка погоды:", e));
+            
+            // Запрашиваем адрес (обратный геокодер через Яндекс — опционально)
+            // Здесь упрощённо: показываем "Санкт-Петербург" или координаты
+            document.getElementById('locationName').innerHTML = `📍 ${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+        }
+
+        function getUserLocation() {
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        currentLat = position.coords.latitude;
+                        currentLon = position.coords.longitude;
+                        updateLocationAndWeather(currentLat, currentLon, currentLang);
+                    },
+                    (error) => {
+                        console.warn("Геолокация запрещена");
+                        document.getElementById('locationName').innerHTML = "📍 Геолокация не разрешена";
+                        document.getElementById('status').innerHTML = "📍 Разрешите геолокацию в браузере";
+                    }
+                );
+            } else {
+                document.getElementById('locationName').innerHTML = "📍 Браузер не поддерживает геолокацию";
+            }
+        }
+
+        // --- ГОЛОСОВОЙ ВВОД И ОТПРАВКА В БОТ ---
         let audioContext = null;
         let currentVoiceAudio = null;
         let recognition = null;
-        
         const statusDiv = document.getElementById('status');
         let useSpeechRecognition = false;
 
@@ -235,10 +346,10 @@
         if (SpeechRecognition) {
             useSpeechRecognition = true;
             recognition = new SpeechRecognition();
-            recognition.lang = 'ru-RU';
             recognition.continuous = false;
             recognition.interimResults = false;
             recognition.maxAlternatives = 1;
+            recognition.lang = 'ru-RU'; // начальный язык, потом переопределим
         }
 
         function initAudioContext() {
@@ -252,41 +363,31 @@
                 osc.start();
                 osc.stop(0.01);
             }
-            if (audioContext.state === 'suspended') {
-                audioContext.resume();
-            }
+            if (audioContext.state === 'suspended') audioContext.resume();
         }
 
-        async function askAndSpeak(questionText) {
+        async function askAndSpeak(questionText, lang) {
             statusDiv.innerHTML = "🤔 Думаю...";
             try {
-                // 1. Отправляем вопрос на /ask
                 const response = await fetch(`${BOT_URL}/ask`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ question: questionText, lang: 'ru' })
+                    body: JSON.stringify({ question: questionText, lang })
                 });
-                
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                
                 const data = await response.json();
                 const answer = data.answer || "Извините, не удалось получить ответ.";
-                
-                // 2. Получаем аудио от бота через /tts
                 statusDiv.innerHTML = "🎧 Отвечаю голосом...";
+                // TTS через твоего бота
                 const ttsResponse = await fetch(`${BOT_URL}/tts`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text: answer, lang: 'ru' })
+                    body: JSON.stringify({ text: answer, lang })
                 });
-                
                 if (ttsResponse.ok) {
                     const audioBlob = await ttsResponse.blob();
                     const audioUrl = URL.createObjectURL(audioBlob);
-                    if (currentVoiceAudio) {
-                        currentVoiceAudio.pause();
-                        currentVoiceAudio = null;
-                    }
+                    if (currentVoiceAudio) currentVoiceAudio.pause();
                     currentVoiceAudio = new Audio(audioUrl);
                     currentVoiceAudio.play();
                     currentVoiceAudio.onended = () => {
@@ -295,16 +396,14 @@
                     };
                 } else {
                     const utterance = new SpeechSynthesisUtterance(answer);
-                    utterance.lang = 'ru-RU';
+                    utterance.lang = lang === 'ru' ? 'ru-RU' : (lang === 'en' ? 'en-US' : (lang === 'fr' ? 'fr-FR' : 'zh-CN'));
                     window.speechSynthesis.cancel();
                     window.speechSynthesis.speak(utterance);
-                    utterance.onend = () => {
-                        statusDiv.innerHTML = "✅ Готов к следующему вопросу";
-                    };
+                    utterance.onend = () => statusDiv.innerHTML = "✅ Готов к следующему вопросу";
                 }
             } catch (error) {
                 console.error(error);
-                statusDiv.innerHTML = "❌ Ошибка связи. Проверьте CORS или URL бота";
+                statusDiv.innerHTML = "❌ Ошибка связи. Попробуйте позже";
             }
         }
 
@@ -315,21 +414,21 @@
             }
             initAudioContext();
             statusDiv.innerHTML = "🎤 Слушаю... задайте вопрос";
+            recognition.lang = 'ru-RU'; // сначала русский, потом при result определим
             recognition.start();
         }
 
         if (recognition) {
             recognition.onresult = (event) => {
-                const question = event.results[0][0].transcript;
-                statusDiv.innerHTML = `🎤 Спросил: "${question.substring(0, 40)}${question.length > 40 ? '…' : ''}"`;
-                askAndSpeak(question);
+                const rawQuestion = event.results[0][0].transcript;
+                const detected = detectLanguage(rawQuestion);
+                currentLang = detected;
+                statusDiv.innerHTML = `🎤 (${detected.toUpperCase()}) Спросил: "${rawQuestion.substring(0, 50)}${rawQuestion.length > 50 ? '…' : ''}"`;
+                askAndSpeak(rawQuestion, detected);
             };
             recognition.onerror = (event) => {
-                if (event.error === 'not-allowed') {
-                    statusDiv.innerHTML = "❌ Нет доступа к микрофону. Разрешите доступ";
-                } else {
-                    statusDiv.innerHTML = "❌ Не распознал. Попробуйте ещё раз";
-                }
+                if (event.error === 'not-allowed') statusDiv.innerHTML = "❌ Нет доступа к микрофону";
+                else statusDiv.innerHTML = "❌ Не распознал. Попробуйте ещё раз";
             };
             recognition.onend = () => {
                 if (statusDiv.innerHTML.includes("Слушаю")) {
@@ -348,21 +447,13 @@
         let musicOsc = null;
         let musicGain = null;
         let isMusicOn = false;
-
         function initMusicCtx() {
-            if (!musicCtx) {
-                musicCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            if (musicCtx.state === 'suspended') {
-                musicCtx.resume();
-            }
+            if (!musicCtx) musicCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (musicCtx.state === 'suspended') musicCtx.resume();
         }
-
         function playMusic() {
             initMusicCtx();
-            if (musicOsc) {
-                try { musicOsc.stop(); } catch(e) {}
-            }
+            if (musicOsc) try { musicOsc.stop(); } catch(e) {}
             musicOsc = musicCtx.createOscillator();
             musicGain = musicCtx.createGain();
             musicOsc.connect(musicGain);
@@ -374,45 +465,30 @@
             musicGain.gain.exponentialRampToValueAtTime(0.00001, musicCtx.currentTime + 2);
             isMusicOn = true;
             document.getElementById('trackName').innerHTML = "🎵 Играет пианино (2 сек)";
-            setTimeout(() => {
-                if (isMusicOn) {
-                    document.getElementById('trackName').innerHTML = "🎵 DeVox Music · Готово";
-                }
-            }, 2000);
+            setTimeout(() => { if (isMusicOn) document.getElementById('trackName').innerHTML = "🎵 DeVox Music · Готово"; }, 2000);
         }
-
         function stopMusic() {
-            if (musicOsc) {
-                try { musicOsc.stop(); } catch(e) {}
-                musicOsc = null;
-            }
-            if (musicCtx) {
-                musicCtx.close();
-                musicCtx = null;
-            }
+            if (musicOsc) try { musicOsc.stop(); } catch(e) {}
+            musicOsc = null;
+            if (musicCtx) musicCtx.close();
+            musicCtx = null;
             isMusicOn = false;
             document.getElementById('trackName').innerHTML = "🎵 Остановлено";
-            setTimeout(() => {
-                document.getElementById('trackName').innerHTML = "🎵 DeVox Music · Тестовое пианино";
-            }, 1200);
+            setTimeout(() => { document.getElementById('trackName').innerHTML = "🎵 DeVox Music · Тестовое пианино"; }, 1200);
         }
-
         document.getElementById('playMusicBtn').onclick = () => playMusic();
         document.getElementById('pauseMusicBtn').onclick = () => {
-            if (musicOsc) {
-                try { musicOsc.stop(); } catch(e) {}
-                musicOsc = null;
-            }
+            if (musicOsc) try { musicOsc.stop(); } catch(e) {}
+            musicOsc = null;
             isMusicOn = false;
             document.getElementById('trackName').innerHTML = "🎵 Пауза";
         };
         document.getElementById('stopMusicBtn').onclick = () => stopMusic();
-        document.getElementById('volUp').onclick = () => {
-            if (musicGain) musicGain.gain.value = Math.min(0.4, musicGain.gain.value + 0.05);
-        };
-        document.getElementById('volDown').onclick = () => {
-            if (musicGain) musicGain.gain.value = Math.max(0, musicGain.gain.value - 0.05);
-        };
+        document.getElementById('volUp').onclick = () => { if (musicGain) musicGain.gain.value = Math.min(0.4, musicGain.gain.value + 0.05); };
+        document.getElementById('volDown').onclick = () => { if (musicGain) musicGain.gain.value = Math.max(0, musicGain.gain.value - 0.05); };
+
+        // --- ЗАПУСК ПРИ ЗАГРУЗКЕ ---
+        getUserLocation();
     </script>
 </body>
-</html>
+    </html>
