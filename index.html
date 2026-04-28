@@ -51,7 +51,7 @@
             text-align: center;
             margin-bottom: 20px;
         }
-        /* ЭКРАН-ПЕЙДЖЕР (временный) */
+        /* КАРТОЧКА ЛОКАЦИИ И ПОГОДЫ */
         .info-card {
             background: rgba(255,255,255,0.05);
             border-radius: 24px;
@@ -74,6 +74,7 @@
             color: #ffaa44;
             font-weight: 500;
             font-size: 14px;
+            word-break: break-word;
         }
         .weather-row {
             display: flex;
@@ -198,7 +199,7 @@
         <h1>DeVox</h1>
         <div class="sub">Голосовой помощник в путешествиях</div>
 
-        <!-- ЭКРАН-ПЕЙДЖЕР: локация + погода -->
+        <!-- КАРТОЧКА С МЕСТОПОЛОЖЕНИЕМ И ПОГОДОЙ -->
         <div class="info-card" id="infoCard">
             <div class="location-header">
                 <span>📍</span>
@@ -226,7 +227,6 @@
             🐺 Нажми и задай вопрос о путешествиях
         </div>
 
-        <!-- Плеер с бегущей строкой -->
         <div class="compact-player">
             <div class="marquee-container">
                 <div class="marquee" id="marqueeText">
@@ -258,6 +258,7 @@
         let currentLang = 'ru';
         let currentLat = null;
         let currentLon = null;
+        let updateInterval = null;
 
         // --- БЕГУЩАЯ СТРОКА ---
         const marqueeMessages = [
@@ -275,7 +276,7 @@
         }
         setInterval(updateMarquee, 8000);
 
-        // --- ОПРЕДЕЛЕНИЕ ЯЗЫКА ПО ТЕКСТУ (ру, en, fr, zh) ---
+        // --- ОПРЕДЕЛЕНИЕ ЯЗЫКА ПО ТЕКСТУ ---
         function detectLanguage(text) {
             if (/[а-яё]/i.test(text)) return 'ru';
             if (/[éèêëàâçîïûü]/i.test(text)) return 'fr';
@@ -284,38 +285,47 @@
             return 'ru';
         }
 
-        // --- ГЕОЛОКАЦИЯ И ОБНОВЛЕНИЕ ЭКРАНА ---
-        function updateLocationAndWeather(lat, lon, lang) {
-            // Обновляем координаты
-            currentLat = lat;
-            currentLon = lon;
-            // Запрашиваем погоду у бота
-            fetch(`${BOT_URL}/weather`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ lat, lon, lang })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.text) {
-                    // Парсим текст погоды (упрощённо)
-                    const weatherText = data.text;
-                    document.getElementById('weatherTemp').innerHTML = weatherText.match(/[+-]?\d+°C/)?.[0] || '--°C';
-                    document.getElementById('weatherDesc').innerHTML = weatherText.match(/[а-яa-z]+/i)?.[0] || '--';
-                    const windHum = weatherText.match(/💨\s*[\d\.]+\s*м\/с\s*[│|]?\s*💧\s*[\d\.]+%/);
-                    if (windHum) document.getElementById('weatherMeta').innerHTML = windHum[0];
-                    // Совет — берём строку после «✨ *Совет:*»
-                    const tipMatch = weatherText.match(/✨\s*\*Совет:\*\s*(.+?)(?:\n|$)/i);
+        // --- ОБНОВЛЕНИЕ ЭКРАНА (АДРЕС + ПОГОДА) ---
+        async function updateLocationAndWeather(lat, lon, lang) {
+            try {
+                // 1. Получаем адрес
+                const locRes = await fetch(`${BOT_URL}/location`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ lat, lon, lang })
+                });
+                if (locRes.ok) {
+                    const locData = await locRes.json();
+                    document.getElementById('locationName').innerHTML = locData.address || `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+                } else {
+                    document.getElementById('locationName').innerHTML = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+                }
+
+                // 2. Получаем погоду
+                const weatherRes = await fetch(`${BOT_URL}/weather`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ lat, lon, lang })
+                });
+                if (weatherRes.ok) {
+                    const weatherData = await weatherRes.json();
+                    const weatherText = weatherData.text;
+                    // Парсим погоду (упрощённо, для наглядности)
+                    const tempMatch = weatherText.match(/[+-]?\d+°C/);
+                    if (tempMatch) document.getElementById('weatherTemp').innerHTML = tempMatch[0];
+                    const descMatch = weatherText.match(/[а-яa-z]+/i);
+                    if (descMatch) document.getElementById('weatherDesc').innerHTML = descMatch[0];
+                    const windHumMatch = weatherText.match(/💨\s*[\d\.]+\s*м\/с\s*[│|]?\s*💧\s*[\d\.]+%/);
+                    if (windHumMatch) document.getElementById('weatherMeta').innerHTML = windHumMatch[0];
+                    const tipMatch = weatherText.match(/✨\s*Совет:\s*(.+?)(?:\n|$)/i);
                     if (tipMatch) document.getElementById('weatherTip').innerHTML = `✨ Совет: ${tipMatch[1]}`;
                 }
-            })
-            .catch(e => console.warn("Ошибка погоды:", e));
-            
-            // Запрашиваем адрес (обратный геокодер через Яндекс — опционально)
-            // Здесь упрощённо: показываем "Санкт-Петербург" или координаты
-            document.getElementById('locationName').innerHTML = `📍 ${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+            } catch (e) {
+                console.warn("Ошибка обновления:", e);
+            }
         }
 
+        // --- ЗАПРОС ГЕОЛОКАЦИИ ---
         function getUserLocation() {
             if ("geolocation" in navigator) {
                 navigator.geolocation.getCurrentPosition(
@@ -335,38 +345,79 @@
             }
         }
 
-        // --- ГОЛОСОВОЙ ВВОД И ОТПРАВКА В БОТ ---
-        let audioContext = null;
-        let currentVoiceAudio = null;
-        let recognition = null;
-        const statusDiv = document.getElementById('status');
-        let useSpeechRecognition = false;
-
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (SpeechRecognition) {
-            useSpeechRecognition = true;
-            recognition = new SpeechRecognition();
-            recognition.continuous = false;
-            recognition.interimResults = false;
-            recognition.maxAlternatives = 1;
-            recognition.lang = 'ru-RU'; // начальный язык, потом переопределим
+        // --- АВТООБНОВЛЕНИЕ КАЖДЫЕ 5 МИНУТ ---
+        function startAutoUpdates() {
+            if (updateInterval) clearInterval(updateInterval);
+            updateInterval = setInterval(() => {
+                if (currentLat && currentLon) {
+                    updateLocationAndWeather(currentLat, currentLon, currentLang);
+                } else {
+                    getUserLocation();
+                }
+            }, 300000); // 5 минут
         }
 
-        function initAudioContext() {
-            if (!audioContext) {
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                const gain = audioContext.createGain();
-                gain.gain.value = 0;
-                gain.connect(audioContext.destination);
-                const osc = audioContext.createOscillator();
-                osc.connect(gain);
-                osc.start();
-                osc.stop(0.01);
+        // --- ОЗВУЧКА ТЕКСТА ЧЕРЕЗ БОТА ---
+        async function speakViaBot(text, lang) {
+            try {
+                const ttsResponse = await fetch(`${BOT_URL}/tts`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text, lang })
+                });
+                if (ttsResponse.ok) {
+                    const audioBlob = await ttsResponse.blob();
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    const audio = new Audio(audioUrl);
+                    audio.play();
+                } else {
+                    throw new Error("TTS failed");
+                }
+            } catch (e) {
+                // fallback: браузерный голос
+                const utterance = new SpeechSynthesisUtterance(text);
+                const langMap = { ru: 'ru-RU', en: 'en-US', fr: 'fr-FR', zh: 'zh-CN' };
+                utterance.lang = langMap[lang] || 'ru-RU';
+                window.speechSynthesis.cancel();
+                window.speechSynthesis.speak(utterance);
             }
-            if (audioContext.state === 'suspended') audioContext.resume();
         }
 
+        // --- ОБРАБОТКА ГОЛОСОВЫХ КОМАНД ---
+        async function processVoiceCommand(questionText, lang) {
+            const lower = questionText.toLowerCase();
+            // Команда "Где я?"
+            if (lower.includes('где я') || lower.includes('where am i') || lower.includes('où suis-je') || lower.includes('我在哪里')) {
+                const address = document.getElementById('locationName').innerText;
+                const answer = `Вы находитесь: ${address}`;
+                statusDiv.innerHTML = "📍 " + answer;
+                await speakViaBot(answer, lang);
+                return true;
+            }
+            // Команда "Какая погода?"
+            if (lower.includes('погода') || lower.includes('weather') || lower.includes('temps') || lower.includes('天气')) {
+                // Принудительно обновим погоду
+                if (currentLat && currentLon) {
+                    await updateLocationAndWeather(currentLat, currentLon, lang);
+                }
+                const temp = document.getElementById('weatherTemp').innerText;
+                const desc = document.getElementById('weatherDesc').innerText;
+                const tip = document.getElementById('weatherTip').innerText;
+                const answer = `Погода: ${temp}, ${desc}. ${tip}`;
+                statusDiv.innerHTML = "🌤️ " + answer;
+                await speakViaBot(answer, lang);
+                return true;
+            }
+            return false; // не команда
+        }
+
+        // --- ОСНОВНАЯ ФУНКЦИЯ ОТПРАВКИ ВОПРОСА В БОТ ---
+        let currentVoiceAudio = null;
         async function askAndSpeak(questionText, lang) {
+            // Сначала проверяем, не команда ли это
+            const isCommand = await processVoiceCommand(questionText, lang);
+            if (isCommand) return;
+
             statusDiv.innerHTML = "🤔 Думаю...";
             try {
                 const response = await fetch(`${BOT_URL}/ask`, {
@@ -378,33 +429,40 @@
                 const data = await response.json();
                 const answer = data.answer || "Извините, не удалось получить ответ.";
                 statusDiv.innerHTML = "🎧 Отвечаю голосом...";
-                // TTS через твоего бота
-                const ttsResponse = await fetch(`${BOT_URL}/tts`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text: answer, lang })
-                });
-                if (ttsResponse.ok) {
-                    const audioBlob = await ttsResponse.blob();
-                    const audioUrl = URL.createObjectURL(audioBlob);
-                    if (currentVoiceAudio) currentVoiceAudio.pause();
-                    currentVoiceAudio = new Audio(audioUrl);
-                    currentVoiceAudio.play();
-                    currentVoiceAudio.onended = () => {
-                        URL.revokeObjectURL(audioUrl);
-                        statusDiv.innerHTML = "✅ Готов к следующему вопросу";
-                    };
-                } else {
-                    const utterance = new SpeechSynthesisUtterance(answer);
-                    utterance.lang = lang === 'ru' ? 'ru-RU' : (lang === 'en' ? 'en-US' : (lang === 'fr' ? 'fr-FR' : 'zh-CN'));
-                    window.speechSynthesis.cancel();
-                    window.speechSynthesis.speak(utterance);
-                    utterance.onend = () => statusDiv.innerHTML = "✅ Готов к следующему вопросу";
-                }
+                await speakViaBot(answer, lang);
+                statusDiv.innerHTML = "✅ Готов к следующему вопросу";
             } catch (error) {
                 console.error(error);
                 statusDiv.innerHTML = "❌ Ошибка связи. Попробуйте позже";
             }
+        }
+
+        // --- ГОЛОСОВОЙ ВВОД ---
+        let recognition = null;
+        const statusDiv = document.getElementById('status');
+        let useSpeechRecognition = false;
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SpeechRecognition) {
+            useSpeechRecognition = true;
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+            recognition.lang = 'ru-RU';
+        }
+
+        function initAudioContext() {
+            if (!window.audioContext) {
+                window.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const gain = window.audioContext.createGain();
+                gain.gain.value = 0;
+                gain.connect(window.audioContext.destination);
+                const osc = window.audioContext.createOscillator();
+                osc.connect(gain);
+                osc.start();
+                osc.stop(0.01);
+            }
+            if (window.audioContext.state === 'suspended') window.audioContext.resume();
         }
 
         function startVoiceInput() {
@@ -414,17 +472,17 @@
             }
             initAudioContext();
             statusDiv.innerHTML = "🎤 Слушаю... задайте вопрос";
-            recognition.lang = 'ru-RU'; // сначала русский, потом при result определим
+            recognition.lang = 'ru-RU';
             recognition.start();
         }
 
         if (recognition) {
-            recognition.onresult = (event) => {
+            recognition.onresult = async (event) => {
                 const rawQuestion = event.results[0][0].transcript;
                 const detected = detectLanguage(rawQuestion);
                 currentLang = detected;
                 statusDiv.innerHTML = `🎤 (${detected.toUpperCase()}) Спросил: "${rawQuestion.substring(0, 50)}${rawQuestion.length > 50 ? '…' : ''}"`;
-                askAndSpeak(rawQuestion, detected);
+                await askAndSpeak(rawQuestion, detected);
             };
             recognition.onerror = (event) => {
                 if (event.error === 'not-allowed') statusDiv.innerHTML = "❌ Нет доступа к микрофону";
@@ -489,6 +547,7 @@
 
         // --- ЗАПУСК ПРИ ЗАГРУЗКЕ ---
         getUserLocation();
+        startAutoUpdates();
     </script>
 </body>
-    </html>
+</html>
