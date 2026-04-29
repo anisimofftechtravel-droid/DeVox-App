@@ -17,73 +17,74 @@
             justify-content: center;
             align-items: center;
             font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
-            padding: 20px;
+            padding: 16px;
         }
         .app {
             background: #0f0f0f;
             border-radius: 32px;
-            padding: 24px 20px;
+            padding: 20px 16px;
             width: 100%;
-            max-width: 450px;
+            max-width: 420px;
             box-shadow: 0 25px 45px rgba(0,0,0,0.6);
             border: 1px solid rgba(255,255,255,0.08);
         }
         .decox-emoji {
-            font-size: 64px;
+            font-size: 56px;
             text-align: center;
             filter: drop-shadow(0 0 15px rgba(255,165,0,0.6));
             animation: float 3s ease-in-out infinite;
         }
         @keyframes float {
             0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-8px); }
+            50% { transform: translateY(-6px); }
         }
         h1 {
             color: white;
-            font-size: 26px;
+            font-size: 24px;
             text-align: center;
-            margin: 12px 0 4px;
+            margin: 8px 0 2px;
             font-weight: 600;
         }
         .sub {
             color: #888;
-            font-size: 12px;
+            font-size: 11px;
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
         /* КАРТОЧКА ЛОКАЦИИ И ПОГОДЫ */
         .info-card {
             background: rgba(255,255,255,0.05);
             border-radius: 24px;
-            padding: 16px;
-            margin-bottom: 20px;
+            padding: 14px;
+            margin-bottom: 16px;
             border: 1px solid rgba(255,255,255,0.08);
         }
         .location-header {
             display: flex;
             align-items: center;
             gap: 8px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             padding-bottom: 8px;
             border-bottom: 1px solid rgba(255,255,255,0.1);
         }
         .location-header span:first-child {
-            font-size: 20px;
+            font-size: 18px;
         }
         .location-header span:last-child {
             color: #ffaa44;
             font-weight: 500;
-            font-size: 14px;
+            font-size: 13px;
             word-break: break-word;
+            flex: 1;
         }
         .weather-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
         .weather-temp {
-            font-size: 28px;
+            font-size: 32px;
             font-weight: bold;
             color: white;
         }
@@ -94,24 +95,24 @@
         .weather-meta {
             display: flex;
             gap: 16px;
-            margin: 10px 0;
+            margin: 8px 0;
             font-size: 12px;
             color: #888;
         }
         .ai-tip {
             background: rgba(255,200,100,0.1);
             border-radius: 16px;
-            padding: 10px 12px;
+            padding: 8px 12px;
             font-size: 12px;
             color: #ffcc88;
-            margin-top: 10px;
+            margin-top: 8px;
         }
         .ask-button {
             width: 100%;
             background: linear-gradient(135deg, #ffaa44, #ff8844);
             border: none;
             border-radius: 60px;
-            padding: 16px 20px;
+            padding: 14px 20px;
             font-size: 18px;
             font-weight: bold;
             color: #1a1a1a;
@@ -120,7 +121,8 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
+            transition: transform 0.05s ease;
         }
         .ask-button:active {
             transform: scale(0.97);
@@ -128,10 +130,10 @@
         .status {
             background: rgba(255,255,255,0.05);
             border-radius: 40px;
-            padding: 10px 16px;
-            font-size: 13px;
+            padding: 8px 14px;
+            font-size: 12px;
             color: #88ff88;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             text-align: center;
             border: 1px solid rgba(255,255,255,0.05);
         }
@@ -144,16 +146,16 @@
         .marquee-container {
             background: rgba(0,0,0,0.6);
             border-radius: 50px;
-            padding: 6px 12px;
+            padding: 5px 10px;
             margin-bottom: 8px;
             overflow: hidden;
             white-space: nowrap;
         }
         .marquee {
             display: inline-block;
-            animation: scroll 8s linear infinite;
+            animation: scroll 10s linear infinite;
             color: #ffaa44;
-            font-size: 11px;
+            font-size: 10px;
         }
         @keyframes scroll {
             0% { transform: translateX(100%); }
@@ -173,6 +175,7 @@
             font-size: 11px;
             color: #ddd;
             cursor: pointer;
+            transition: 0.1s;
         }
         .player-controls button:active {
             background: #ffaa44;
@@ -188,7 +191,17 @@
             font-size: 9px;
             color: #444;
             text-align: center;
-            margin-top: 16px;
+            margin-top: 14px;
+        }
+        .loading-dots::after {
+            content: '';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+        @keyframes dots {
+            0%, 20% { content: ''; }
+            40% { content: '.'; }
+            60% { content: '..'; }
+            80%, 100% { content: '...'; }
         }
     </style>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -203,7 +216,7 @@
         <div class="info-card" id="infoCard">
             <div class="location-header">
                 <span>📍</span>
-                <span id="locationName">Определение местоположения...</span>
+                <span id="locationName">Определение...</span>
             </div>
             <div id="weatherBlock">
                 <div class="weather-row">
@@ -214,7 +227,7 @@
                     💨 -- м/с &nbsp;|&nbsp; 💧 --%
                 </div>
                 <div class="ai-tip" id="weatherTip">
-                    ✨ Совет: ...
+                    ✨ Загрузка...
                 </div>
             </div>
         </div>
@@ -224,13 +237,13 @@
         </button>
 
         <div class="status" id="status">
-            🐺 Нажми и задай вопрос о путешествиях
+            🐺 Нажми и задай вопрос
         </div>
 
         <div class="compact-player">
             <div class="marquee-container">
                 <div class="marquee" id="marqueeText">
-                    🎵 Включай на полную — волк в деле! 🐺✨
+                    🎵 DeVox FM — музыка для дороги 🐺✨
                 </div>
             </div>
             <div class="player-controls">
@@ -240,7 +253,7 @@
                 <button id="volUp">🔊+</button>
                 <button id="volDown">🔉-</button>
             </div>
-            <div class="track-name" id="trackName">🎵 DeVox Music · Тестовое пианино</div>
+            <div class="track-name" id="trackName">🎵 DeVox Music · тестовое пианино</div>
         </div>
 
         <div class="footer">
@@ -249,44 +262,87 @@
     </div>
 
     <script>
-        const tg = window.Telegram.WebApp;
-        tg.ready();
-        tg.expand();
-
         // ========== НАСТРОЙКИ ==========
-        const BOT_URL = 'https://devox-bot.onrender.com';
+        const BOT_URL = 'https://devox-bot.onrender.com';  // ЗАМЕНИ НА СВОЙ URL
         let currentLang = 'ru';
         let currentLat = null;
         let currentLon = null;
+        let watchId = null;
         let updateInterval = null;
-
-        // --- БЕГУЩАЯ СТРОКА ---
-        const marqueeMessages = [
-            "🎵 Путешествие начинается... 🎵",
-            "🐺 DeVox FM — музыка для дороги",
-            "🎧 Волк в наушниках — твой спутник",
-            "✨ Слушай и путешествуй с комфортом",
-            "🎶 Включай на полную — волк в деле!"
-        ];
-        let marqueeIndex = 0;
-        function updateMarquee() {
-            marqueeIndex = (marqueeIndex + 1) % marqueeMessages.length;
-            const marqueeEl = document.getElementById('marqueeText');
-            if (marqueeEl) marqueeEl.textContent = marqueeMessages[marqueeIndex];
+        let isUpdating = false;
+        let retryCount = 0;
+        const MAX_RETRY = 3;
+        
+        // Кэш в localStorage
+        const CACHE_TTL = 300000; // 5 минут
+        
+        function saveToCache(key, data) {
+            try {
+                localStorage.setItem(key, JSON.stringify({
+                    data: data,
+                    expires: Date.now() + CACHE_TTL
+                }));
+            } catch(e) { console.warn('Cache save error', e); }
         }
-        setInterval(updateMarquee, 8000);
-
-        // --- ОПРЕДЕЛЕНИЕ ЯЗЫКА ПО ТЕКСТУ ---
+        
+        function getFromCache(key) {
+            try {
+                const item = localStorage.getItem(key);
+                if (!item) return null;
+                const parsed = JSON.parse(item);
+                if (Date.now() > parsed.expires) {
+                    localStorage.removeItem(key);
+                    return null;
+                }
+                return parsed.data;
+            } catch(e) { return null; }
+        }
+        
+        function saveLastLocation(lat, lon) {
+            localStorage.setItem('last_lat', lat);
+            localStorage.setItem('last_lon', lon);
+            localStorage.setItem('last_lang', currentLang);
+        }
+        
+        function loadLastLocation() {
+            const lat = localStorage.getItem('last_lat');
+            const lon = localStorage.getItem('last_lon');
+            const lang = localStorage.getItem('last_lang');
+            if (lat && lon) {
+                currentLat = parseFloat(lat);
+                currentLon = parseFloat(lon);
+                if (lang) currentLang = lang;
+                return true;
+            }
+            return false;
+        }
+        
+        // ========== ОПРЕДЕЛЕНИЕ ЯЗЫКА ПО ТЕКСТУ ==========
         function detectLanguage(text) {
             if (/[а-яё]/i.test(text)) return 'ru';
             if (/[éèêëàâçîïûü]/i.test(text)) return 'fr';
             if (/[\u4e00-\u9fff\u3400-\u4dbf]/.test(text)) return 'zh';
             if (/[a-z]/i.test(text)) return 'en';
-            return 'ru';
+            return currentLang;
         }
-
-        // --- ОБНОВЛЕНИЕ ЭКРАНА (АДРЕС + ПОГОДА) ---
-        async function updateLocationAndWeather(lat, lon, lang) {
+        
+        // ========== ОБНОВЛЕНИЕ ЭКРАНА (АДРЕС + ПОГОДА) ==========
+        async function updateLocationAndWeather(lat, lon, lang, force = false) {
+            if (isUpdating && !force) return;
+            isUpdating = true;
+            
+            const cacheKey = `weather_${lat.toFixed(4)}_${lon.toFixed(4)}_${lang}`;
+            
+            // Пытаемся взять из кэша
+            if (!force) {
+                const cached = getFromCache(cacheKey);
+                if (cached) {
+                    applyWeatherData(cached);
+                    isUpdating = false;
+                    return;
+                }
+            }
+            
             try {
                 // 1. Получаем адрес
                 const locRes = await fetch(`${BOT_URL}/location`, {
@@ -300,64 +356,50 @@
                 } else {
                     document.getElementById('locationName').innerHTML = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
                 }
-
-                // 2. Получаем погоду
-                const weatherRes = await fetch(`${BOT_URL}/weather`, {
+                
+                // 2. Получаем погоду через новый эндпоинт
+                const weatherRes = await fetch(`${BOT_URL}/weather_voice`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ lat, lon, lang })
                 });
+                
                 if (weatherRes.ok) {
                     const weatherData = await weatherRes.json();
-                    const weatherText = weatherData.text;
-                    // Парсим погоду (упрощённо, для наглядности)
-                    const tempMatch = weatherText.match(/[+-]?\d+°C/);
-                    if (tempMatch) document.getElementById('weatherTemp').innerHTML = tempMatch[0];
-                    const descMatch = weatherText.match(/[а-яa-z]+/i);
-                    if (descMatch) document.getElementById('weatherDesc').innerHTML = descMatch[0];
-                    const windHumMatch = weatherText.match(/💨\s*[\d\.]+\s*м\/с\s*[│|]?\s*💧\s*[\d\.]+%/);
-                    if (windHumMatch) document.getElementById('weatherMeta').innerHTML = windHumMatch[0];
-                    const tipMatch = weatherText.match(/✨\s*Совет:\s*(.+?)(?:\n|$)/i);
-                    if (tipMatch) document.getElementById('weatherTip').innerHTML = `✨ Совет: ${tipMatch[1]}`;
+                    if (weatherData.error) throw new Error(weatherData.error);
+                    
+                    // Сохраняем в кэш
+                    saveToCache(cacheKey, weatherData);
+                    applyWeatherData(weatherData);
+                    retryCount = 0;
+                } else {
+                    throw new Error('Weather API error');
                 }
             } catch (e) {
                 console.warn("Ошибка обновления:", e);
-            }
-        }
-
-        // --- ЗАПРОС ГЕОЛОКАЦИИ ---
-        function getUserLocation() {
-            if ("geolocation" in navigator) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        currentLat = position.coords.latitude;
-                        currentLon = position.coords.longitude;
-                        updateLocationAndWeather(currentLat, currentLon, currentLang);
-                    },
-                    (error) => {
-                        console.warn("Геолокация запрещена");
-                        document.getElementById('locationName').innerHTML = "📍 Геолокация не разрешена";
-                        document.getElementById('status').innerHTML = "📍 Разрешите геолокацию в браузере";
-                    }
-                );
-            } else {
-                document.getElementById('locationName').innerHTML = "📍 Браузер не поддерживает геолокацию";
-            }
-        }
-
-        // --- АВТООБНОВЛЕНИЕ КАЖДЫЕ 5 МИНУТ ---
-        function startAutoUpdates() {
-            if (updateInterval) clearInterval(updateInterval);
-            updateInterval = setInterval(() => {
-                if (currentLat && currentLon) {
-                    updateLocationAndWeather(currentLat, currentLon, currentLang);
+                if (retryCount < MAX_RETRY) {
+                    retryCount++;
+                    setTimeout(() => {
+                        updateLocationAndWeather(lat, lon, lang, true);
+                    }, 2000);
                 } else {
-                    getUserLocation();
+                    document.getElementById('locationName').innerHTML = "⚠️ Ошибка связи";
+                    document.getElementById('status').innerHTML = "❌ Не удалось обновить данные";
+                    retryCount = 0;
                 }
-            }, 300000); // 5 минут
+            } finally {
+                isUpdating = false;
+            }
         }
-
-        // --- ОЗВУЧКА ТЕКСТА ЧЕРЕЗ БОТА ---
+        
+        function applyWeatherData(data) {
+            document.getElementById('weatherTemp').innerHTML = `${data.temp}°C`;
+            document.getElementById('weatherDesc').innerHTML = data.condition;
+            document.getElementById('weatherMeta').innerHTML = `💨 ${data.wind} м/с &nbsp;|&nbsp; 💧 ${data.humidity}%`;
+            document.getElementById('weatherTip').innerHTML = `✨ ${data.advice}`;
+        }
+        
+        // ========== ОЗВУЧКА ЧЕРЕЗ БОТА (с получением советов) ==========
         async function speakViaBot(text, lang) {
             try {
                 const ttsResponse = await fetch(`${BOT_URL}/tts`, {
@@ -382,42 +424,70 @@
                 window.speechSynthesis.speak(utterance);
             }
         }
-
-        // --- ОБРАБОТКА ГОЛОСОВЫХ КОМАНД ---
+        
+        // ========== ПОЛУЧЕНИЕ ПОГОДЫ ДЛЯ ГОЛОСА ==========
+        async function getWeatherVoiceData(lat, lon, lang) {
+            try {
+                const res = await fetch(`${BOT_URL}/weather_voice`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ lat, lon, lang })
+                });
+                if (res.ok) {
+                    return await res.json();
+                }
+                return null;
+            } catch (e) {
+                console.warn(e);
+                return null;
+            }
+        }
+        
+        // ========== ОБРАБОТКА ГОЛОСОВЫХ КОМАНД ==========
         async function processVoiceCommand(questionText, lang) {
             const lower = questionText.toLowerCase();
+            
             // Команда "Где я?"
-            if (lower.includes('где я') || lower.includes('where am i') || lower.includes('où suis-je') || lower.includes('我在哪里')) {
+            if (lower.includes('где я') || lower.includes('where am i') || 
+                lower.includes('où suis-je') || lower.includes('我在哪里')) {
                 const address = document.getElementById('locationName').innerText;
                 const answer = `Вы находитесь: ${address}`;
                 statusDiv.innerHTML = "📍 " + answer;
                 await speakViaBot(answer, lang);
                 return true;
             }
-            // Команда "Какая погода?"
-            if (lower.includes('погода') || lower.includes('weather') || lower.includes('temps') || lower.includes('天气')) {
-                // Принудительно обновим погоду
+            
+            // Команда "Погода" — получаем свежие данные с советом
+            if (lower.includes('погода') || lower.includes('weather') || 
+                lower.includes('temps') || lower.includes('天气')) {
                 if (currentLat && currentLon) {
-                    await updateLocationAndWeather(currentLat, currentLon, lang);
+                    statusDiv.innerHTML = "🌤️ Получаю погоду...";
+                    const weatherData = await getWeatherVoiceData(currentLat, currentLon, lang);
+                    if (weatherData && weatherData.voice_text) {
+                        // Обновляем UI свежими данными
+                        applyWeatherData(weatherData);
+                        await speakViaBot(weatherData.voice_text, lang);
+                        statusDiv.innerHTML = "✅ Погода озвучена";
+                    } else {
+                        const answer = "Не удалось получить данные о погоде";
+                        await speakViaBot(answer, lang);
+                        statusDiv.innerHTML = "❌ " + answer;
+                    }
+                } else {
+                    const answer = "Сначала определите ваше местоположение";
+                    await speakViaBot(answer, lang);
+                    statusDiv.innerHTML = "📍 " + answer;
                 }
-                const temp = document.getElementById('weatherTemp').innerText;
-                const desc = document.getElementById('weatherDesc').innerText;
-                const tip = document.getElementById('weatherTip').innerText;
-                const answer = `Погода: ${temp}, ${desc}. ${tip}`;
-                statusDiv.innerHTML = "🌤️ " + answer;
-                await speakViaBot(answer, lang);
                 return true;
             }
-            return false; // не команда
+            return false;
         }
-
-        // --- ОСНОВНАЯ ФУНКЦИЯ ОТПРАВКИ ВОПРОСА В БОТ ---
-        let currentVoiceAudio = null;
+        
+        // ========== ОСНОВНАЯ ФУНКЦИЯ ОТПРАВКИ В БОТ ==========
         async function askAndSpeak(questionText, lang) {
-            // Сначала проверяем, не команда ли это
             const isCommand = await processVoiceCommand(questionText, lang);
             if (isCommand) return;
-
+            
             statusDiv.innerHTML = "🤔 Думаю...";
             try {
                 const response = await fetch(`${BOT_URL}/ask`, {
@@ -436,21 +506,53 @@
                 statusDiv.innerHTML = "❌ Ошибка связи. Попробуйте позже";
             }
         }
-
-        // --- ГОЛОСОВОЙ ВВОД ---
-        let recognition = null;
-        const statusDiv = document.getElementById('status');
-        let useSpeechRecognition = false;
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (SpeechRecognition) {
-            useSpeechRecognition = true;
-            recognition = new SpeechRecognition();
-            recognition.continuous = false;
-            recognition.interimResults = false;
-            recognition.maxAlternatives = 1;
-            recognition.lang = 'ru-RU';
+        
+        // ========== ГЕОЛОКАЦИЯ С ОТСЛЕЖИВАНИЕМ ПЕРЕМЕЩЕНИЯ ==========
+        function startWatchingLocation() {
+            if (watchId) {
+                navigator.geolocation.clearWatch(watchId);
+            }
+            
+            watchId = navigator.geolocation.watchPosition(
+                (position) => {
+                    const newLat = position.coords.latitude;
+                    const newLon = position.coords.longitude;
+                    
+                    // Проверяем, изменилась ли позиция (больше 50 метров)
+                    if (currentLat && currentLon) {
+                        const dist = Math.sqrt(Math.pow(newLat - currentLat, 2) + Math.pow(newLon - currentLon, 2)) * 111000;
+                        if (dist < 50) return; // не обновляем, если сдвиг меньше 50м
+                    }
+                    
+                    currentLat = newLat;
+                    currentLon = newLon;
+                    saveLastLocation(currentLat, currentLon);
+                    updateLocationAndWeather(currentLat, currentLon, currentLang);
+                },
+                (error) => {
+                    console.warn("Геолокация ошибка:", error);
+                    if (error.code === 1) {
+                        document.getElementById('locationName').innerHTML = "📍 Геолокация запрещена";
+                        document.getElementById('status').innerHTML = "📍 Разрешите геолокацию в браузере";
+                    } else if (loadLastLocation()) {
+                        updateLocationAndWeather(currentLat, currentLon, currentLang);
+                    }
+                },
+                { enableHighAccuracy: true, maximumAge: 30000, timeout: 10000 }
+            );
         }
-
+        
+        // ========== АВТООБНОВЛЕНИЕ КАЖДЫЕ 5 МИНУТ ==========
+        function startAutoUpdates() {
+            if (updateInterval) clearInterval(updateInterval);
+            updateInterval = setInterval(() => {
+                if (currentLat && currentLon) {
+                    updateLocationAndWeather(currentLat, currentLon, currentLang, true);
+                }
+            }, 300000);
+        }
+        
+        // ========== ИНИЦИАЛИЗАЦИЯ АУДИОКОНТЕКСТА ==========
         function initAudioContext() {
             if (!window.audioContext) {
                 window.audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -464,51 +566,88 @@
             }
             if (window.audioContext.state === 'suspended') window.audioContext.resume();
         }
-
+        
+        // ========== ГОЛОСОВОЙ ВВОД ==========
+        let recognition = null;
+        const statusDiv = document.getElementById('status');
+        let useSpeechRecognition = false;
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        
+        if (SpeechRecognition) {
+            useSpeechRecognition = true;
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+        }
+        
+        let isListening = false;
+        
         function startVoiceInput() {
             if (!useSpeechRecognition) {
                 statusDiv.innerHTML = "❌ Ваш браузер не поддерживает голосовой ввод";
                 return;
             }
+            if (isListening) return;
+            
             initAudioContext();
+            isListening = true;
             statusDiv.innerHTML = "🎤 Слушаю... задайте вопрос";
             recognition.lang = 'ru-RU';
             recognition.start();
         }
-
+        
         if (recognition) {
+            recognition.onstart = () => {
+                isListening = true;
+            };
+            
             recognition.onresult = async (event) => {
                 const rawQuestion = event.results[0][0].transcript;
                 const detected = detectLanguage(rawQuestion);
                 currentLang = detected;
-                statusDiv.innerHTML = `🎤 (${detected.toUpperCase()}) Спросил: "${rawQuestion.substring(0, 50)}${rawQuestion.length > 50 ? '…' : ''}"`;
+                saveLastLocation(currentLat, currentLon);
+                statusDiv.innerHTML = `🎤 (${detected.toUpperCase()}) "${rawQuestion.substring(0, 50)}${rawQuestion.length > 50 ? '…' : ''}"`;
                 await askAndSpeak(rawQuestion, detected);
+                isListening = false;
             };
+            
             recognition.onerror = (event) => {
-                if (event.error === 'not-allowed') statusDiv.innerHTML = "❌ Нет доступа к микрофону";
-                else statusDiv.innerHTML = "❌ Не распознал. Попробуйте ещё раз";
-            };
-            recognition.onend = () => {
-                if (statusDiv.innerHTML.includes("Слушаю")) {
-                    statusDiv.innerHTML = "🐺 Нажми «Спросить» и задай вопрос";
+                console.warn("Speech error:", event.error);
+                if (event.error === 'not-allowed') {
+                    statusDiv.innerHTML = "❌ Нет доступа к микрофону";
+                } else if (event.error === 'no-speech') {
+                    statusDiv.innerHTML = "🎤 Не услышал. Попробуйте ещё раз";
+                } else {
+                    statusDiv.innerHTML = "❌ Ошибка распознавания";
                 }
+                isListening = false;
+            };
+            
+            recognition.onend = () => {
+                if (isListening) {
+                    statusDiv.innerHTML = "🐺 Нажмите кнопку для вопроса";
+                }
+                isListening = false;
             };
         }
-
+        
         document.getElementById('askBtn').onclick = () => {
             initAudioContext();
             startVoiceInput();
         };
-
-        // --- МУЗЫКАЛЬНЫЙ ПЛЕЕР ---
+        
+        // ========== МУЗЫКАЛЬНЫЙ ПЛЕЕР (тестовая версия) ==========
         let musicCtx = null;
         let musicOsc = null;
         let musicGain = null;
         let isMusicOn = false;
+        
         function initMusicCtx() {
             if (!musicCtx) musicCtx = new (window.AudioContext || window.webkitAudioContext)();
             if (musicCtx.state === 'suspended') musicCtx.resume();
         }
+        
         function playMusic() {
             initMusicCtx();
             if (musicOsc) try { musicOsc.stop(); } catch(e) {}
@@ -523,8 +662,11 @@
             musicGain.gain.exponentialRampToValueAtTime(0.00001, musicCtx.currentTime + 2);
             isMusicOn = true;
             document.getElementById('trackName').innerHTML = "🎵 Играет пианино (2 сек)";
-            setTimeout(() => { if (isMusicOn) document.getElementById('trackName').innerHTML = "🎵 DeVox Music · Готово"; }, 2000);
+            setTimeout(() => { 
+                if (isMusicOn) document.getElementById('trackName').innerHTML = "🎵 DeVox Music · тестовое пианино"; 
+            }, 2000);
         }
+        
         function stopMusic() {
             if (musicOsc) try { musicOsc.stop(); } catch(e) {}
             musicOsc = null;
@@ -532,8 +674,11 @@
             musicCtx = null;
             isMusicOn = false;
             document.getElementById('trackName').innerHTML = "🎵 Остановлено";
-            setTimeout(() => { document.getElementById('trackName').innerHTML = "🎵 DeVox Music · Тестовое пианино"; }, 1200);
+            setTimeout(() => { 
+                document.getElementById('trackName').innerHTML = "🎵 DeVox Music · тестовое пианино"; 
+            }, 1200);
         }
+        
         document.getElementById('playMusicBtn').onclick = () => playMusic();
         document.getElementById('pauseMusicBtn').onclick = () => {
             if (musicOsc) try { musicOsc.stop(); } catch(e) {}
@@ -542,12 +687,37 @@
             document.getElementById('trackName').innerHTML = "🎵 Пауза";
         };
         document.getElementById('stopMusicBtn').onclick = () => stopMusic();
-        document.getElementById('volUp').onclick = () => { if (musicGain) musicGain.gain.value = Math.min(0.4, musicGain.gain.value + 0.05); };
-        document.getElementById('volDown').onclick = () => { if (musicGain) musicGain.gain.value = Math.max(0, musicGain.gain.value - 0.05); };
-
-        // --- ЗАПУСК ПРИ ЗАГРУЗКЕ ---
-        getUserLocation();
-        startAutoUpdates();
+        document.getElementById('volUp').onclick = () => { 
+            if (musicGain) musicGain.gain.value = Math.min(0.4, musicGain.gain.value + 0.05); 
+        };
+        document.getElementById('volDown').onclick = () => { 
+            if (musicGain) musicGain.gain.value = Math.max(0, musicGain.gain.value - 0.05); 
+        };
+        
+        // ========== БЕГУЩАЯ СТРОКА ==========
+        const marqueeMessages = [
+            "🎵 DeVox FM — музыка для дороги",
+            "🐺 Волк в наушниках — твой спутник",
+            "✨ Спрашивай про города и погоду",
+            "🎧 Путешествуй с комфортом"
+        ];
+        let marqueeIndex = 0;
+        function updateMarquee() {
+            marqueeIndex = (marqueeIndex + 1) % marqueeMessages.length;
+            const marqueeEl = document.getElementById('marqueeText');
+            if (marqueeEl) marqueeEl.textContent = marqueeMessages[marqueeIndex];
+        }
+        setInterval(updateMarquee, 8000);
+        
+        // ========== ЗАПУСК ==========
+        if (loadLastLocation()) {
+            updateLocationAndWeather(currentLat, currentLon, currentLang);
+            startWatchingLocation();
+            startAutoUpdates();
+        } else {
+            startWatchingLocation();
+            startAutoUpdates();
+        }
     </script>
 </body>
 </html>
